@@ -44,9 +44,17 @@ class ForecastService:
             )
 
         model = Prophet()
+
+        df_prophet["cap"] = df_prophet["y"].max() * 1.5
+        df_prophet["floor"] = 0
+
+        model = Prophet(growth="logistic")
         model.fit(df_prophet)
 
         future = model.make_future_dataframe(periods=period_amount, freq=tech_freq)
+        future["cap"] = df_prophet["y"].max() * 1.5
+        future["floor"] = 0
+
         forecast = model.predict(future)
 
         summary = forecast[["ds", "yhat", "yhat_lower", "yhat_upper"]].tail(

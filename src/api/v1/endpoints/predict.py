@@ -1,11 +1,10 @@
-import io
-
-import pandas as pd
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, UploadFile
 
 from src.core.config import settings
 from src.integrations.mistral_client import MistralClient
+from src.services.data_cleaning_service import DataCleaningService
 from src.services.forecast_service import ForecastService
+from src.utils.file_helper import FileHelper
 
 router = APIRouter()
 forecast_service = ForecastService()
@@ -20,30 +19,16 @@ async def predict_sales(
     period_type: str = Form(...),
     period_amount: int = Form(...),
 ):
-    content = await file.read()
-    filename = file.filename or ""
+    df_raw = await FileHelper.parse_to_dataframe(file)
 
-    try:
-        df = (
-            pd.read_csv(io.BytesIO(content))
-            if filename.endswith(".csv")
-            else pd.read_excel(io.BytesIO(content))
-        )
-        df.columns = df.columns.str.strip()
-    except Exception as e:
-        raise HTTPException(
-            status_code=400, detail=f"Erro ao processar arquivo: {str(e)}"
-        )
+    df_clean = DataCleaningService.clean_sales_data(df_raw, col_date, col_amount)
 
-    try:
-        data_final, tech_freq = forecast_service.run_prediction(
-            df, col_date, col_amount, period_type, period_amount
-        )
-    except KeyError:
-        return {
-            "error": "Colunas não encontradas no arquivo",
-            "disponivel": df.columns.tolist(),
-        }
+    data_final, tech_freq = forecast_service.run_prediction(
+        df_clean, col_date, col_amount, period_type, period_amount
+    )
+
+    for row in data_final:
+        row["min_estimate"] = max(0, row["min_estimate"])
 
     period_human_name = settings.MAP_HUMAN.get(tech_freq, "períodos")
     insight = ai_client.get_business_insight(

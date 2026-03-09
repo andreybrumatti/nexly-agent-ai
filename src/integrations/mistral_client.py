@@ -16,7 +16,8 @@ class MistralClient:
         Quantidade: {amount}
         Valores: {data}
 
-        Instrução Adicional: O usuário quer saber o que fazer com esses números. 
+        Instrução Adicional: O usuário quer saber o que fazer com esses números. Não retorne nome de variáveis
+        ou campos enviados, no lugar coloque palavras que as informações estão relacionadas.
         Lembre-se: Se for 'semanas' ou 'meses', o valor é a SOMA total do período.
         """
 
