@@ -18,6 +18,7 @@ async def predict_sales(
     col_amount: str = Form(...),
     period_type: str = Form(...),
     period_amount: int = Form(...),
+    description_business: str = Form(...),
 ):
     df_raw = await FileHelper.parse_to_dataframe(file)
 
@@ -32,7 +33,7 @@ async def predict_sales(
 
     period_human_name = settings.MAP_HUMAN.get(tech_freq, "períodos")
     insight = ai_client.get_business_insight(
-        data_final, period_human_name, period_amount
+        data_final, period_human_name, description_business, period_amount
     )
 
     return {

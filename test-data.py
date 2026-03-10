@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-def generate_nexly_data(days=180):
+def generate_nexly_data(days=360):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days)
     date_range = pd.date_range(start=start_date, end=end_date, freq="D")
@@ -34,8 +34,8 @@ def generate_nexly_data(days=180):
 
     df = pd.DataFrame(data)
 
-    df.to_csv("vendas_mock_6_meses.csv", index=False)
-    df.to_excel("vendas_mock_6_meses.xlsx", index=False)
+    df.to_csv("vendas_mock_12_meses.csv", index=False)
+    df.to_excel("vendas_mock_12_meses.xlsx", index=False)
 
 
 if __name__ == "__main__":
