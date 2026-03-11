@@ -1,0 +1,11 @@
+services:
+  nexly-api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      - TZ=America/Sao_Paulo
